@@ -11,7 +11,7 @@
     .dependencies = .{
         // Used by tests
         .zmath = .{
-            .url = "https://github.com/zig-gamedev/zmath/archive/refs/heads/main.tar.gz",
+            .url = "https://github.com/zig-gamedev/zmath/archive/fb075f0f2f90d6d938a5959a3a79700cdec155c2.tar.gz",
             .hash = "1220081d55b58b968d953db1afc2fb01b2f5733929144e69522461ce25fa6450d84e",
         },
     },
