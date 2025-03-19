@@ -1,5 +1,6 @@
 .{
-    .name = "zbullet",
+    .name = .zbullet,
+    .fingerprint = 0xdea5c1cd8f1709ee, // Changing this has security and trust implications.
     .version = "0.4.0-dev",
     .paths = .{
         "build.zig",

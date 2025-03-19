@@ -40,7 +40,7 @@ export fn zbulletAlloc(size: usize, alignment: i32) callconv(.C) ?*anyopaque {
 
     const ptr = mem_allocator.?.rawAlloc(
         size,
-        std.math.log2_int(u29, @as(u29, @intCast(alignment))),
+        std.mem.Alignment.fromByteUnits(@intCast(alignment)),
         @returnAddress(),
     );
     if (ptr == null) @panic("zbullet: out of memory");
@@ -64,7 +64,7 @@ export fn zbulletFree(maybe_ptr: ?*anyopaque) callconv(.C) void {
 
         mem_allocator.?.rawFree(
             mem,
-            std.math.log2_int(u29, @as(u29, @intCast(info.alignment))),
+            std.mem.Alignment.fromByteUnits(@intCast(info.alignment)),
             @returnAddress(),
         );
     }
