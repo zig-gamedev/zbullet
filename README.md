@@ -70,7 +70,7 @@ pub fn main() !void {
         &initial_transform,
         box_shape.asShape(),
     );
-    defer body.deinit();
+    defer box_body.deinit();
 
     // Add body to the physics world.
     world.addBody(box_body);
