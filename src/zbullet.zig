@@ -787,6 +787,9 @@ const BodyImpl = opaque {
     pub const setDamping = cbtBodySetDamping;
     extern fn cbtBodySetDamping(body: Body, linear: f32, angular: f32) void;
 
+    pub const setAngularFactor = cbtBodySetAngularFactor;
+    extern fn cbtBodySetAngularFactor(body: Body, factor: *const [3]f32) void;
+
     pub const getLinearDamping = cbtBodyGetLinearDamping;
     extern fn cbtBodyGetLinearDamping(body: Body) f32;
 
