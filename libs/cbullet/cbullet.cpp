@@ -430,6 +430,7 @@ CbtShapeHandle cbtShapeAllocate(int shape_type) {
         case CBT_SHAPE_TYPE_CONE: size = sizeof(btConeShape); break;
         case CBT_SHAPE_TYPE_CYLINDER: size = sizeof(btCylinderShape); break;
         case CBT_SHAPE_TYPE_COMPOUND: size = sizeof(btCompoundShape); break;
+        case CBT_SHAPE_TYPE_CONVEX_HULL: size = sizeof(btConvexHullShape); break;
         case CBT_SHAPE_TYPE_TRIANGLE_MESH:
             size = sizeof(btBvhTriangleMeshShape) + sizeof(btTriangleIndexVertexArray);
             break;
@@ -650,6 +651,26 @@ int cbtShapeConeGetUpAxis(CbtShapeHandle shape_handle) {
     assert(cbtShapeGetType(shape_handle) == CBT_SHAPE_TYPE_CONE);
     auto shape = (btConeShape*)shape_handle;
     return shape->getConeUpIndex();
+}
+
+void cbtShapeConvexHullCreate(CbtShapeHandle shape_handle, const float* points, int num_points, int stride){
+    assert(shape_handle && !cbtShapeIsCreated(shape_handle));
+    assert(cbtShapeGetType(shape_handle) == CBT_SHAPE_TYPE_CONVEX_HULL);
+    new (shape_handle) btConvexHullShape(points, num_points, stride);
+}
+
+void cbtShapeConvexHullAddPoint(CbtShapeHandle shape_handle, const CbtVector3 point, bool recalculate_local_aabb){
+    assert(shape_handle && cbtShapeIsCreated(shape_handle));
+    assert(cbtShapeGetType(shape_handle) == CBT_SHAPE_TYPE_CONVEX_HULL);
+    auto shape = (btConvexHullShape*)shape_handle;
+    shape->addPoint(btVector3(point[0], point[1], point[2]), recalculate_local_aabb);
+}
+
+void cbtShapeConvexHullRecalcLocalAabb(CbtShapeHandle shape_handle){
+    assert(shape_handle && cbtShapeIsCreated(shape_handle));
+    assert(cbtShapeGetType(shape_handle) == CBT_SHAPE_TYPE_CONVEX_HULL);
+    auto shape = (btConvexHullShape*)shape_handle;
+    shape->recalcLocalAabb();
 }
 
 void cbtShapeCompoundCreate(

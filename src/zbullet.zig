@@ -12,6 +12,7 @@ pub const BoxShape = *align(@sizeOf(usize)) BoxShapeImpl;
 pub const SphereShape = *align(@sizeOf(usize)) SphereShapeImpl;
 pub const CapsuleShape = *align(@sizeOf(usize)) CapsuleShapeImpl;
 pub const CylinderShape = *align(@sizeOf(usize)) CylinderShapeImpl;
+pub const ConvexHullShape = *align(@sizeOf(usize)) ConvexHullShapeImpl;
 pub const CompoundShape = *align(@sizeOf(usize)) CompoundShapeImpl;
 pub const TriangleMeshShape = *align(@sizeOf(usize)) TriangleMeshShapeImpl;
 pub const Body = *align(@sizeOf(usize)) BodyImpl;
@@ -285,6 +286,7 @@ pub const ShapeType = enum(c_int) {
     cylinder = 13,
     compound = 31,
     trimesh = 21,
+    convex_hull = 4,
 };
 
 const ShapeImpl = opaque {
@@ -306,6 +308,7 @@ const ShapeImpl = opaque {
             .capsule,
             .cylinder,
             .compound,
+            .convex_hull
             => cbtShapeDestroy(shape),
             .trimesh => cbtShapeTriMeshDestroy(shape),
         }
@@ -561,6 +564,40 @@ const CylinderShapeImpl = opaque {
     extern fn cbtShapeCylinderGetUpAxis(capsule: CylinderShape) Axis;
 };
 
+const ConvexHullShapeImpl = opaque {
+    pub usingnamespace ShapeFunctions(ConvexHullShape);
+
+    fn alloc() ConvexHullShape {
+        return @as(ConvexHullShape, @ptrCast(ShapeImpl.alloc(.convex_hull)));
+    }
+
+    pub const create = cbtShapeConvexHullCreate;
+    extern fn cbtShapeConvexHullCreate(
+        convex_hull: ConvexHullShape,
+        points: ?*f32,
+        num_points: i32,
+        stride: i32,
+    ) void;
+
+    pub const recalcLocalAabb = cbtShapeConvexHullRecalcLocalAabb;
+    extern fn cbtShapeConvexHullRecalcLocalAabb(convex_hull: ConvexHullShape) void;
+
+    pub const addPoint = cbtShapeConvexHullAddPoint;
+    extern fn cbtShapeConvexHullAddPoint(convex_hull: ConvexHullShape, point: *const [3]f32, recalculate_local_aabb: bool) void;
+};
+
+pub fn initConvexHullShape(
+    args: struct {
+        points: ?*f32 = null,
+        num_points: i32 = 0,
+        stride: i32 = @sizeOf([3]f32),
+    },
+) ConvexHullShape {
+    const cshape = ConvexHullShapeImpl.alloc();
+    cshape.create(args.points, args.num_points, args.stride);
+    return cshape;
+}
+
 pub fn initCompoundShape(
     args: struct {
         enable_dynamic_aabb_tree: bool = true,
@@ -786,6 +823,12 @@ const BodyImpl = opaque {
 
     pub const setDamping = cbtBodySetDamping;
     extern fn cbtBodySetDamping(body: Body, linear: f32, angular: f32) void;
+
+    pub const setLinearVelocity = cbtBodySetLinearVelocity;
+    extern fn cbtBodySetLinearVelocity(body: Body, velocity: *const [3]f32) void;
+
+    pub const getLinearVelocity = cbtBodyGetLinearVelocity;
+    extern fn cbtBodyGetLinearVelocity(body: Body, velocity: *[3]f32) void;
 
     pub const setAngularFactor = cbtBodySetAngularFactor;
     extern fn cbtBodySetAngularFactor(body: Body, factor: *const [3]f32) void;
