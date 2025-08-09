@@ -303,13 +303,7 @@ const ShapeImpl = opaque {
 
     pub fn destroy(shape: Shape) void {
         switch (shape.getType()) {
-            .box,
-            .sphere,
-            .capsule,
-            .cylinder,
-            .compound,
-            .convex_hull
-            => cbtShapeDestroy(shape),
+            .box, .sphere, .capsule, .cylinder, .compound, .convex_hull => cbtShapeDestroy(shape),
             .trimesh => cbtShapeTriMeshDestroy(shape),
         }
     }
@@ -372,6 +366,7 @@ const ShapeImpl = opaque {
         .capsule => CapsuleShape,
         .compound => CompoundShape,
         .trimesh => TriangleMeshShape,
+        .convex_hull => ConvexHullShape,
     } {
         std.debug.assert(shape.getType() == stype);
         return switch (stype) {
@@ -381,6 +376,7 @@ const ShapeImpl = opaque {
             .capsule => @as(CapsuleShape, @ptrCast(shape)),
             .compound => @as(CompoundShape, @ptrCast(shape)),
             .trimesh => @as(TriangleMeshShape, @ptrCast(shape)),
+            .convex_hull => @as(ConvexHullShape, @ptrCast(shape)),
         };
     }
 };
