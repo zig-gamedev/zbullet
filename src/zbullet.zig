@@ -1,4 +1,3 @@
-// zbullet v0.2
 // Zig bindings for Bullet Physics SDK
 
 const builtin = @import("builtin");
@@ -381,7 +380,7 @@ const ShapeImpl = opaque {
     }
 };
 
-fn ShapeFunctions(comptime T: type) type {
+fn ShapeInterface(comptime T: type) type {
     return struct {
         pub fn asShape(shape: T) Shape {
             return @as(Shape, @ptrCast(shape));
@@ -426,8 +425,8 @@ fn ShapeFunctions(comptime T: type) type {
         pub fn isCompound(shape: T) bool {
             return shape.asShape().isCompound();
         }
-        pub fn calculateLocalInertia(shape: Shape, mass: f32, inertia: *[3]f32) void {
-            shape.asShape().calculateLocalInertia(shape, mass, inertia);
+        pub fn calculateLocalInertia(shape: T, mass: f32, inertia: *[3]f32) void {
+            shape.asShape().calculateLocalInertia(mass, inertia);
         }
         pub fn setUserPointer(shape: T, ptr: ?*anyopaque) void {
             shape.asShape().setUserPointer(ptr);
@@ -444,6 +443,41 @@ fn ShapeFunctions(comptime T: type) type {
     };
 }
 
+fn ConstraintInterface(comptime T: type) type {
+    return struct {
+        pub fn asConstraint(con: T) Constraint {
+            return @as(Constraint, @ptrCast(con));
+        }
+        pub fn dealloc(con: T) void {
+            con.asConstraint().dealloc();
+        }
+        pub fn destroy(con: T) void {
+            con.asConstraint().destroy();
+        }
+        pub fn getType(con: T) ConstraintType {
+            return con.asConstraint().getType();
+        }
+        pub fn isCreated(con: T) bool {
+            return con.asConstraint().isCreated();
+        }
+        pub fn setEnabled(con: T, enabled: bool) void {
+            con.asConstraint().setEnabled(enabled);
+        }
+        pub fn isEnabled(con: T) bool {
+            return con.asConstraint().isEnabled();
+        }
+        pub fn getBodyA(con: T) Body {
+            return con.asConstraint().getBodyA();
+        }
+        pub fn getBodyB(con: T) Body {
+            return con.asConstraint().getBodyB();
+        }
+        pub fn setDebugDrawSize(con: T, size: f32) void {
+            con.asConstraint().setDebugDrawSize(size);
+        }
+    };
+}
+
 pub fn initBoxShape(half_extents: *const [3]f32) BoxShape {
     const box = BoxShapeImpl.alloc();
     box.create(half_extents);
@@ -451,7 +485,26 @@ pub fn initBoxShape(half_extents: *const [3]f32) BoxShape {
 }
 
 const BoxShapeImpl = opaque {
-    pub usingnamespace ShapeFunctions(BoxShape);
+    const Interface = ShapeInterface(BoxShape);
+    pub const asShape = Interface.asShape;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const deinit = Interface.deinit;
+    pub const isCreated = Interface.isCreated;
+    pub const getType = Interface.getType;
+    pub const setMargin = Interface.setMargin;
+    pub const getMargin = Interface.getMargin;
+    pub const isPolyhedral = Interface.isPolyhedral;
+    pub const isConvex2d = Interface.isConvex2d;
+    pub const isConvex = Interface.isConvex;
+    pub const isNonMoving = Interface.isNonMoving;
+    pub const isConcave = Interface.isConcave;
+    pub const isCompound = Interface.isCompound;
+    pub const calculateLocalInertia = Interface.calculateLocalInertia;
+    pub const setUserPointer = Interface.setUserPointer;
+    pub const getUserPointer = Interface.getUserPointer;
+    pub const setUserIndex = Interface.setUserIndex;
+    pub const getUserIndex = Interface.getUserIndex;
 
     fn alloc() BoxShape {
         return @as(BoxShape, @ptrCast(ShapeImpl.alloc(.box)));
@@ -474,7 +527,26 @@ pub fn initSphereShape(radius: f32) SphereShape {
 }
 
 const SphereShapeImpl = opaque {
-    pub usingnamespace ShapeFunctions(SphereShape);
+    const Interface = ShapeInterface(SphereShape);
+    pub const asShape = Interface.asShape;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const deinit = Interface.deinit;
+    pub const isCreated = Interface.isCreated;
+    pub const getType = Interface.getType;
+    pub const setMargin = Interface.setMargin;
+    pub const getMargin = Interface.getMargin;
+    pub const isPolyhedral = Interface.isPolyhedral;
+    pub const isConvex2d = Interface.isConvex2d;
+    pub const isConvex = Interface.isConvex;
+    pub const isNonMoving = Interface.isNonMoving;
+    pub const isConcave = Interface.isConcave;
+    pub const isCompound = Interface.isCompound;
+    pub const calculateLocalInertia = Interface.calculateLocalInertia;
+    pub const setUserPointer = Interface.setUserPointer;
+    pub const getUserPointer = Interface.getUserPointer;
+    pub const setUserIndex = Interface.setUserIndex;
+    pub const getUserIndex = Interface.getUserIndex;
 
     fn alloc() SphereShape {
         return @as(SphereShape, @ptrCast(ShapeImpl.alloc(.sphere)));
@@ -497,7 +569,26 @@ pub fn initCapsuleShape(radius: f32, height: f32, upaxis: Axis) CapsuleShape {
 }
 
 const CapsuleShapeImpl = opaque {
-    pub usingnamespace ShapeFunctions(CapsuleShape);
+    const Interface = ShapeInterface(CapsuleShape);
+    pub const asShape = Interface.asShape;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const deinit = Interface.deinit;
+    pub const isCreated = Interface.isCreated;
+    pub const getType = Interface.getType;
+    pub const setMargin = Interface.setMargin;
+    pub const getMargin = Interface.getMargin;
+    pub const isPolyhedral = Interface.isPolyhedral;
+    pub const isConvex2d = Interface.isConvex2d;
+    pub const isConvex = Interface.isConvex;
+    pub const isNonMoving = Interface.isNonMoving;
+    pub const isConcave = Interface.isConcave;
+    pub const isCompound = Interface.isCompound;
+    pub const calculateLocalInertia = Interface.calculateLocalInertia;
+    pub const setUserPointer = Interface.setUserPointer;
+    pub const getUserPointer = Interface.getUserPointer;
+    pub const setUserIndex = Interface.setUserIndex;
+    pub const getUserIndex = Interface.getUserIndex;
 
     fn alloc() CapsuleShape {
         return @as(CapsuleShape, @ptrCast(ShapeImpl.alloc(.capsule)));
@@ -531,7 +622,26 @@ pub fn initCylinderShape(
 }
 
 const CylinderShapeImpl = opaque {
-    pub usingnamespace ShapeFunctions(CylinderShape);
+    const Interface = ShapeInterface(CylinderShape);
+    pub const asShape = Interface.asShape;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const deinit = Interface.deinit;
+    pub const isCreated = Interface.isCreated;
+    pub const getType = Interface.getType;
+    pub const setMargin = Interface.setMargin;
+    pub const getMargin = Interface.getMargin;
+    pub const isPolyhedral = Interface.isPolyhedral;
+    pub const isConvex2d = Interface.isConvex2d;
+    pub const isConvex = Interface.isConvex;
+    pub const isNonMoving = Interface.isNonMoving;
+    pub const isConcave = Interface.isConcave;
+    pub const isCompound = Interface.isCompound;
+    pub const calculateLocalInertia = Interface.calculateLocalInertia;
+    pub const setUserPointer = Interface.setUserPointer;
+    pub const getUserPointer = Interface.getUserPointer;
+    pub const setUserIndex = Interface.setUserIndex;
+    pub const getUserIndex = Interface.getUserIndex;
 
     fn alloc() CylinderShape {
         return @as(CylinderShape, @ptrCast(ShapeImpl.alloc(.cylinder)));
@@ -561,7 +671,26 @@ const CylinderShapeImpl = opaque {
 };
 
 const ConvexHullShapeImpl = opaque {
-    pub usingnamespace ShapeFunctions(ConvexHullShape);
+    const Interface = ShapeInterface(ConvexHullShape);
+    pub const asShape = Interface.asShape;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const deinit = Interface.deinit;
+    pub const isCreated = Interface.isCreated;
+    pub const getType = Interface.getType;
+    pub const setMargin = Interface.setMargin;
+    pub const getMargin = Interface.getMargin;
+    pub const isPolyhedral = Interface.isPolyhedral;
+    pub const isConvex2d = Interface.isConvex2d;
+    pub const isConvex = Interface.isConvex;
+    pub const isNonMoving = Interface.isNonMoving;
+    pub const isConcave = Interface.isConcave;
+    pub const isCompound = Interface.isCompound;
+    pub const calculateLocalInertia = Interface.calculateLocalInertia;
+    pub const setUserPointer = Interface.setUserPointer;
+    pub const getUserPointer = Interface.getUserPointer;
+    pub const setUserIndex = Interface.setUserIndex;
+    pub const getUserIndex = Interface.getUserIndex;
 
     fn alloc() ConvexHullShape {
         return @as(ConvexHullShape, @ptrCast(ShapeImpl.alloc(.convex_hull)));
@@ -606,7 +735,26 @@ pub fn initCompoundShape(
 }
 
 const CompoundShapeImpl = opaque {
-    pub usingnamespace ShapeFunctions(CompoundShape);
+    const Interface = ShapeInterface(CompoundShape);
+    pub const asShape = Interface.asShape;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const deinit = Interface.deinit;
+    pub const isCreated = Interface.isCreated;
+    pub const getType = Interface.getType;
+    pub const setMargin = Interface.setMargin;
+    pub const getMargin = Interface.getMargin;
+    pub const isPolyhedral = Interface.isPolyhedral;
+    pub const isConvex2d = Interface.isConvex2d;
+    pub const isConvex = Interface.isConvex;
+    pub const isNonMoving = Interface.isNonMoving;
+    pub const isConcave = Interface.isConcave;
+    pub const isCompound = Interface.isCompound;
+    pub const calculateLocalInertia = Interface.calculateLocalInertia;
+    pub const setUserPointer = Interface.setUserPointer;
+    pub const getUserPointer = Interface.getUserPointer;
+    pub const setUserIndex = Interface.setUserIndex;
+    pub const getUserIndex = Interface.getUserIndex;
 
     fn alloc() CompoundShape {
         return @as(CompoundShape, @ptrCast(ShapeImpl.alloc(.compound)));
@@ -653,7 +801,26 @@ pub fn initTriangleMeshShape() TriangleMeshShape {
 }
 
 const TriangleMeshShapeImpl = opaque {
-    pub usingnamespace ShapeFunctions(TriangleMeshShape);
+    const Interface = ShapeInterface(TriangleMeshShape);
+    pub const asShape = Interface.asShape;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const deinit = Interface.deinit;
+    pub const isCreated = Interface.isCreated;
+    pub const getType = Interface.getType;
+    pub const setMargin = Interface.setMargin;
+    pub const getMargin = Interface.getMargin;
+    pub const isPolyhedral = Interface.isPolyhedral;
+    pub const isConvex2d = Interface.isConvex2d;
+    pub const isConvex = Interface.isConvex;
+    pub const isNonMoving = Interface.isNonMoving;
+    pub const isConcave = Interface.isConcave;
+    pub const isCompound = Interface.isCompound;
+    pub const calculateLocalInertia = Interface.calculateLocalInertia;
+    pub const setUserPointer = Interface.setUserPointer;
+    pub const getUserPointer = Interface.getUserPointer;
+    pub const setUserIndex = Interface.setUserIndex;
+    pub const getUserIndex = Interface.getUserIndex;
 
     pub fn finish(trimesh: TriangleMeshShape) void {
         trimesh.createEnd();
@@ -909,47 +1076,22 @@ const ConstraintImpl = opaque {
     extern fn cbtConSetDebugDrawSize(con: Constraint, size: f32) void;
 };
 
-fn ConstraintFunctions(comptime T: type) type {
-    return struct {
-        pub fn asConstraint(con: T) Constraint {
-            return @as(Constraint, @ptrCast(con));
-        }
-        pub fn dealloc(con: T) void {
-            con.asConstraint().dealloc();
-        }
-        pub fn destroy(con: T) void {
-            con.asConstraint().destroy();
-        }
-        pub fn getType(con: T) ConstraintType {
-            return con.asConstraint().getType();
-        }
-        pub fn isCreated(con: T) bool {
-            return con.asConstraint().isCreated();
-        }
-        pub fn setEnabled(con: T, enabled: bool) void {
-            con.asConstraint().setEnabled(enabled);
-        }
-        pub fn isEnabled(con: T) bool {
-            return con.asConstraint().isEnabled();
-        }
-        pub fn getBodyA(con: T) Body {
-            return con.asConstraint().getBodyA();
-        }
-        pub fn getBodyB(con: T) Body {
-            return con.asConstraint().getBodyB();
-        }
-        pub fn setDebugDrawSize(con: T, size: f32) void {
-            con.asConstraint().setDebugDrawSize(size);
-        }
-    };
-}
-
 pub fn allocPoint2PointConstraint() Point2PointConstraint {
     return Point2PointConstraintImpl.alloc();
 }
 
 const Point2PointConstraintImpl = opaque {
-    pub usingnamespace ConstraintFunctions(Point2PointConstraint);
+    const Interface = ConstraintInterface(Point2PointConstraint);
+    pub const asConstraint = Interface.asConstraint;
+    pub const dealloc = Interface.dealloc;
+    pub const destroy = Interface.destroy;
+    pub const getType = Interface.getType;
+    pub const isCreated = Interface.isCreated;
+    pub const setEnabled = Interface.setEnabled;
+    pub const isEnabled = Interface.isEnabled;
+    pub const getBodyA = Interface.getBodyA;
+    pub const getBodyB = Interface.getBodyB;
+    pub const setDebugDrawSize = Interface.setDebugDrawSize;
 
     fn alloc() Point2PointConstraint {
         return @as(Point2PointConstraint, @ptrCast(ConstraintImpl.alloc(.point2point)));
