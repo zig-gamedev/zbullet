@@ -18,8 +18,8 @@ pub const Body = *align(@sizeOf(usize)) BodyImpl;
 pub const Constraint = *align(@sizeOf(usize)) ConstraintImpl;
 pub const Point2PointConstraint = *align(@sizeOf(usize)) Point2PointConstraintImpl;
 
-pub const AllocFn = *const fn (size: usize, alignment: i32) callconv(.C) ?*anyopaque;
-pub const FreeFn = *const fn (ptr: ?*anyopaque) callconv(.C) void;
+pub const AllocFn = *const fn (size: usize, alignment: i32) callconv(.c) ?*anyopaque;
+pub const FreeFn = *const fn (ptr: ?*anyopaque) callconv(.c) void;
 
 extern fn cbtAlignedAllocSetCustomAligned(
     alloc: ?AllocFn,
@@ -34,7 +34,7 @@ var mem_allocator: ?std.mem.Allocator = null;
 var mem_allocations: ?std.AutoHashMap(usize, SizeAndAlignment) = null;
 var mem_mutex: std.Thread.Mutex = .{};
 
-export fn zbulletAlloc(size: usize, alignment: i32) callconv(.C) ?*anyopaque {
+export fn zbulletAlloc(size: usize, alignment: i32) callconv(.c) ?*anyopaque {
     mem_mutex.lock();
     defer mem_mutex.unlock();
 
@@ -53,7 +53,7 @@ export fn zbulletAlloc(size: usize, alignment: i32) callconv(.C) ?*anyopaque {
     return ptr;
 }
 
-export fn zbulletFree(maybe_ptr: ?*anyopaque) callconv(.C) void {
+export fn zbulletFree(maybe_ptr: ?*anyopaque) callconv(.c) void {
     if (maybe_ptr) |ptr| {
         mem_mutex.lock();
         defer mem_mutex.unlock();
@@ -1156,7 +1156,7 @@ pub const DebugDraw = extern struct {
         *const [3]f32,
         *const [3]f32,
         *const [3]f32,
-    ) callconv(.C) void;
+    ) callconv(.c) void;
 
     const DrawLine2Fn = *const fn (
         ?*anyopaque,
@@ -1164,7 +1164,7 @@ pub const DebugDraw = extern struct {
         *const [3]f32,
         *const [3]f32,
         *const [3]f32,
-    ) callconv(.C) void;
+    ) callconv(.c) void;
 
     const DrawContactPointFn = *const fn (
         ?*anyopaque,
@@ -1172,7 +1172,7 @@ pub const DebugDraw = extern struct {
         *const [3]f32,
         f32,
         *const [3]f32,
-    ) callconv(.C) void;
+    ) callconv(.c) void;
 
     drawLine1: DrawLine1Fn,
     drawLine2: ?DrawLine2Fn,
@@ -1188,12 +1188,12 @@ pub const DebugDrawer = struct {
         color: u32,
     };
 
-    pub fn init(alloc: std.mem.Allocator) DebugDrawer {
-        return .{ .lines = std.ArrayList(Vertex).init(alloc) };
+    pub fn init() DebugDrawer {
+        return .{ .lines = std.ArrayList(Vertex){} };
     }
 
     pub fn deinit(debug: *DebugDrawer) void {
-        debug.lines.deinit();
+        debug.lines.deinit(mem_allocator.?);
         debug.* = undefined;
     }
 
@@ -1211,7 +1211,7 @@ pub const DebugDrawer = struct {
         p0: *const [3]f32,
         p1: *const [3]f32,
         color: *const [3]f32,
-    ) callconv(.C) void {
+    ) callconv(.c) void {
         const debug = @as(
             *DebugDrawer,
             @ptrCast(@alignCast(context.?)),
@@ -1223,9 +1223,11 @@ pub const DebugDrawer = struct {
         const rgb = r | g | b;
 
         debug.lines.append(
+            mem_allocator.?,
             .{ .position = .{ p0[0], p0[1], p0[2] }, .color = rgb },
         ) catch unreachable;
         debug.lines.append(
+            mem_allocator.?,
             .{ .position = .{ p1[0], p1[1], p1[2] }, .color = rgb },
         ) catch unreachable;
     }
@@ -1236,7 +1238,7 @@ pub const DebugDrawer = struct {
         p1: *const [3]f32,
         color0: *const [3]f32,
         color1: *const [3]f32,
-    ) callconv(.C) void {
+    ) callconv(.c) void {
         const debug = @as(
             *DebugDrawer,
             @ptrCast(@alignCast(context.?)),
@@ -1253,9 +1255,11 @@ pub const DebugDrawer = struct {
         const rgb1 = r1 | g1 | b1;
 
         debug.lines.append(
+            mem_allocator.?,
             .{ .position = .{ p0[0], p0[1], p0[2] }, .color = rgb0 },
         ) catch unreachable;
         debug.lines.append(
+            mem_allocator.?,
             .{ .position = .{ p1[0], p1[1], p1[2] }, .color = rgb1 },
         ) catch unreachable;
     }

@@ -2,7 +2,7 @@
     .name = .zbullet,
     .fingerprint = 0xdea5c1cd8f1709ee, // Changing this has security and trust implications.
     .version = "0.4.0-dev",
-    .minimum_zig_version = "0.14.0",
+    .minimum_zig_version = "0.15.1",
     .paths = .{
         "build.zig",
         "build.zig.zon",
@@ -13,8 +13,8 @@
     .dependencies = .{
         // Used by tests
         .zmath = .{
-            .url = "git+https://github.com/zig-gamedev/zmath#ccf7297ef6c01e21b2d51ad81b5b6ce929e86a00",
-            .hash = "zmath-0.11.0-dev-wjwivZY1AwDO7yxNmZ5HWoU03f9mFBet8LN9-oYc3i29",
+            .url = "https://github.com/zig-gamedev/zmath/archive/3a5955b2b72cd081563fbb084eff05bffd1e3fbb.tar.gz",
+            .hash = "zmath-0.11.0-dev-wjwivdMsAwD-xaLj76YHUq3t9JDH-X16xuMTmnDzqbu2",
         },
     },
 }

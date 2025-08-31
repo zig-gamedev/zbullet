@@ -4,21 +4,11 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const target = b.standardTargetOptions(.{});
 
-    _ = b.addModule("root", .{
+    const module = b.addModule("root", .{
         .root_source_file = b.path("src/zbullet.zig"),
-    });
-
-    const cbullet = b.addStaticLibrary(.{
-        .name = "cbullet",
         .target = target,
         .optimize = optimize,
     });
-    b.installArtifact(cbullet);
-
-    cbullet.addIncludePath(b.path("libs/cbullet"));
-    cbullet.addIncludePath(b.path("libs/bullet"));
-    cbullet.linkLibC();
-    cbullet.linkLibCpp();
 
     // TODO: Use the old damping method for now otherwise there is a hang in powf().
     const flags = &.{
@@ -27,7 +17,7 @@ pub fn build(b: *std.Build) void {
         "-std=c++11",
         "-fno-sanitize=undefined",
     };
-    cbullet.addCSourceFiles(.{
+    module.addCSourceFiles(.{
         .files = &.{
             "libs/cbullet/cbullet.cpp",
             "libs/bullet/btLinearMathAll.cpp",
@@ -36,6 +26,17 @@ pub fn build(b: *std.Build) void {
         },
         .flags = flags,
     });
+    module.addIncludePath(b.path("libs/cbullet"));
+    module.addIncludePath(b.path("libs/bullet"));
+
+    const cbullet_lib = b.addLibrary(.{
+        .name = "cbullet",
+        .root_module = module,
+    });
+    b.installArtifact(cbullet_lib);
+
+    cbullet_lib.linkLibC();
+    cbullet_lib.linkLibCpp();
 
     const test_step = b.step("test", "Run zbullet tests");
 
@@ -43,15 +44,11 @@ pub fn build(b: *std.Build) void {
 
     var tests = b.addTest(.{
         .name = "zbullet-tests",
-        .root_source_file = b.path("src/zbullet.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = module,
     });
     b.installArtifact(tests);
 
     tests.root_module.addImport("zmath", zmath.module("root"));
-
-    tests.linkLibrary(cbullet);
 
     test_step.dependOn(&b.addRunArtifact(tests).step);
 }
