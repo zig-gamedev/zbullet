@@ -926,7 +926,7 @@ const BodyImpl = opaque {
     extern fn cbtBodyGetTotalForce(body: Body, force: *const [3]f32) void;
 
     pub const getTotalTorque = cbtBodyGetTotalTorque;
-    extern fn cbtBodyGetTotalTorque(body: Body, torque: *const [3]f32) void;
+    extern fn cbtBodyGetTotalTorque(body: Body, torque: *[3]f32) void;
 
     pub const setFriction = cbtBodySetFriction;
     extern fn cbtBodySetFriction(body: Body, friction: f32) void;
