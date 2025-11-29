@@ -923,7 +923,7 @@ const BodyImpl = opaque {
     extern fn cbtBodyGetRestitution(body: Body) f32;
 
     pub const getTotalForce = cbtBodyGetTotalForce;
-    extern fn cbtBodyGetTotalForce(body: Body, force: *const [3]f32) void;
+    extern fn cbtBodyGetTotalForce(body: Body, force: *[3]f32) void;
 
     pub const getTotalTorque = cbtBodyGetTotalTorque;
     extern fn cbtBodyGetTotalTorque(body: Body, torque: *[3]f32) void;
