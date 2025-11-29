@@ -922,6 +922,12 @@ const BodyImpl = opaque {
     pub const getRestitution = cbtBodyGetRestitution;
     extern fn cbtBodyGetRestitution(body: Body) f32;
 
+    pub const getTotalForce = cbtBodyGetTotalForce;
+    extern fn cbtBodyGetTotalForce(body: Body, force: *[3]f32) void;
+
+    pub const getTotalTorque = cbtBodyGetTotalTorque;
+    extern fn cbtBodyGetTotalTorque(body: Body, torque: *[3]f32) void;
+
     pub const setFriction = cbtBodySetFriction;
     extern fn cbtBodySetFriction(body: Body, friction: f32) void;
 
@@ -952,11 +958,23 @@ const BodyImpl = opaque {
         transform: *[12]f32,
     ) void;
 
+    pub const applyCentralForce = cbtBodyApplyCentralForce;
+    extern fn cbtBodyApplyCentralForce(body: Body, force: *const [3]f32) void;
+
     pub const applyCentralImpulse = cbtBodyApplyCentralImpulse;
     extern fn cbtBodyApplyCentralImpulse(body: Body, impulse: *const [3]f32) void;
 
+    pub const applyForce = cbtBodyApplyForce;
+    extern fn cbtBodyApplyForce(body: Body, force: *const [3]f32, rel_pos: *const [3]f32) void;
+
+    pub const applyImpulse = cbtBodyApplyImpulse;
+    extern fn cbtBodyApplyImpulse(body: Body, impulse: *const [3]f32, rel_pos: *const [3]f32) void;
+
     pub const applyBodyTorque = cbtBodyApplyTorque;
-    extern fn cbtBodyApplyTorque(body: Body, impulse: *const [3]f32) void;
+    extern fn cbtBodyApplyTorque(body: Body, torque: *const [3]f32) void;
+
+    pub const applyBodyTorqueImpulse = cbtBodyApplyTorqueImpulse;
+    extern fn cbtBodyApplyTorqueImpulse(body: Body, impulse: *const [3]f32) void;
 
     pub const setUserIndex = cbtBodySetUserIndex;
     extern fn cbtBodySetUserIndex(body: Body, slot: u32, index: i32) void;
