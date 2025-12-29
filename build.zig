@@ -28,15 +28,14 @@ pub fn build(b: *std.Build) void {
     });
     module.addIncludePath(b.path("libs/cbullet"));
     module.addIncludePath(b.path("libs/bullet"));
+    module.linkSystemLibrary("c", .{});
+    module.linkSystemLibrary("c++", .{});
 
     const cbullet_lib = b.addLibrary(.{
         .name = "cbullet",
         .root_module = module,
     });
     b.installArtifact(cbullet_lib);
-
-    cbullet_lib.linkLibC();
-    cbullet_lib.linkLibCpp();
 
     const test_step = b.step("test", "Run zbullet tests");
 
