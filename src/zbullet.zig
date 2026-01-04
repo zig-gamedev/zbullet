@@ -1,6 +1,5 @@
 // Zig bindings for Bullet Physics SDK
 
-const builtin = @import("builtin");
 const std = @import("std");
 const Mutex = std.Thread.Mutex;
 const expect = std.testing.expect;

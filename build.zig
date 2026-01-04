@@ -28,8 +28,9 @@ pub fn build(b: *std.Build) void {
     });
     module.addIncludePath(b.path("libs/cbullet"));
     module.addIncludePath(b.path("libs/bullet"));
-    module.linkSystemLibrary("c", .{});
-    module.linkSystemLibrary("c++", .{});
+
+    module.link_libc = true;
+    module.link_libcpp = true;
 
     const cbullet_lib = b.addLibrary(.{
         .name = "cbullet",
