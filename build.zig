@@ -4,12 +4,6 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const target = b.standardTargetOptions(.{});
 
-    const module = b.addModule("root", .{
-        .root_source_file = b.path("src/zbullet.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-
     // TODO: Use the old damping method for now otherwise there is a hang in powf().
     const flags = &.{
         "-DBT_USE_OLD_DAMPING_METHOD",
@@ -17,7 +11,16 @@ pub fn build(b: *std.Build) void {
         "-std=c++11",
         "-fno-sanitize=undefined",
     };
-    module.addCSourceFiles(.{
+
+    const cbullet_lib = b.addLibrary(.{
+        .name = "cbullet",
+        .linkage = .static,
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    cbullet_lib.addCSourceFiles(.{
         .files = &.{
             "libs/cbullet/cbullet.cpp",
             "libs/bullet/btLinearMathAll.cpp",
@@ -26,29 +29,36 @@ pub fn build(b: *std.Build) void {
         },
         .flags = flags,
     });
-    module.addIncludePath(b.path("libs/cbullet"));
-    module.addIncludePath(b.path("libs/bullet"));
-
-    module.link_libc = true;
-    module.link_libcpp = true;
-
-    const cbullet_lib = b.addLibrary(.{
-        .name = "cbullet",
-        .root_module = module,
-    });
+    cbullet_lib.addIncludePath(b.path("libs/cbullet"));
+    cbullet_lib.addIncludePath(b.path("libs/bullet"));
+    cbullet_lib.linkLibC();
+    cbullet_lib.linkLibCpp();
     b.installArtifact(cbullet_lib);
+
+    const module = b.addModule("root", .{
+        .root_source_file = b.path("src/zbullet.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    module.linkLibrary(cbullet_lib);
 
     const test_step = b.step("test", "Run zbullet tests");
 
     const zmath = b.dependency("zmath", .{});
 
-    var tests = b.addTest(.{
+    const test_module = b.createModule(.{
+        .root_source_file = b.path("src/zbullet.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    test_module.addImport("zmath", zmath.module("root"));
+    test_module.linkLibrary(cbullet_lib);
+
+    const tests = b.addTest(.{
         .name = "zbullet-tests",
-        .root_module = module,
+        .root_module = test_module,
     });
     b.installArtifact(tests);
-
-    tests.root_module.addImport("zmath", zmath.module("root"));
 
     test_step.dependOn(&b.addRunArtifact(tests).step);
 }
