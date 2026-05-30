@@ -15,12 +15,15 @@ pub fn build(b: *std.Build) void {
     const cbullet_lib = b.addLibrary(.{
         .name = "cbullet",
         .linkage = .static,
+
         .root_module = b.createModule(.{
             .target = target,
             .optimize = optimize,
+            .link_libc = true,
+            .link_libcpp = true,
         }),
     });
-    cbullet_lib.addCSourceFiles(.{
+    cbullet_lib.root_module.addCSourceFiles(.{
         .files = &.{
             "libs/cbullet/cbullet.cpp",
             "libs/bullet/btLinearMathAll.cpp",
@@ -29,10 +32,8 @@ pub fn build(b: *std.Build) void {
         },
         .flags = flags,
     });
-    cbullet_lib.addIncludePath(b.path("libs/cbullet"));
-    cbullet_lib.addIncludePath(b.path("libs/bullet"));
-    cbullet_lib.linkLibC();
-    cbullet_lib.linkLibCpp();
+    cbullet_lib.root_module.addIncludePath(b.path("libs/cbullet"));
+    cbullet_lib.root_module.addIncludePath(b.path("libs/bullet"));
     b.installArtifact(cbullet_lib);
 
     const module = b.addModule("root", .{
