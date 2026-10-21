@@ -34,7 +34,7 @@ var mem_allocations: ?std.AutoHashMap(usize, SizeAndAlignment) = null;
 var mem_mutex: std.Io.Mutex = .init;
 
 export fn zbulletAlloc(size: usize, alignment: i32) callconv(.c) ?*anyopaque {
-    std.Io.Threaded.mutexLock(&mem_mutex);
+    std.Io.Threaded.mutexLockUncancelable(&mem_mutex);
     defer std.Io.Threaded.mutexUnlock(&mem_mutex);
 
     const ptr = mem_allocator.?.rawAlloc(
@@ -54,7 +54,7 @@ export fn zbulletAlloc(size: usize, alignment: i32) callconv(.c) ?*anyopaque {
 
 export fn zbulletFree(maybe_ptr: ?*anyopaque) callconv(.c) void {
     if (maybe_ptr) |ptr| {
-        std.Io.Threaded.mutexLock(&mem_mutex);
+        std.Io.Threaded.mutexLockUncancelable(&mem_mutex);
         defer std.Io.Threaded.mutexUnlock(&mem_mutex);
 
         const info = mem_allocations.?.fetchRemove(@intFromPtr(ptr)).?.value;
